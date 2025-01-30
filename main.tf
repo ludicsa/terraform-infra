@@ -6,5 +6,4 @@ resource "aws_lambda_function" "lambda_function" {
   runtime       = var.lambda_runtime
   handler       = "index.handler"
   filename      = var.lambda_zip_file
-  role          = aws_iam_role.lambda_role.arn
 }
