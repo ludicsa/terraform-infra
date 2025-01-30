@@ -10,12 +10,6 @@ on:
         options:
           - dev
           - prod
-      tech:
-        description: 'Tech stack (Python, Node.js, etc.)'
-        required: true
-      url:
-        description: 'URL da API Gateway'
-        required: false
 
 jobs:
   deploy:
