@@ -10,6 +10,9 @@ on:
         options:
           - dev
           - prod
+      tech:
+        description: 'Tech stack (Python, Node.js, etc.)'
+        required: true
 
 jobs:
   deploy:
