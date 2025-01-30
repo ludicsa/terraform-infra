@@ -2,7 +2,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# Criar Role para a Lambda
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda_exec_role"
 
@@ -18,14 +17,12 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
-# Criar Policy para Logs no CloudWatch
 resource "aws_iam_policy_attachment" "lambda_logs" {
   name       = "lambda_logs"
   roles      = [aws_iam_role.lambda_exec.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# Criar a AWS Lambda
 resource "aws_lambda_function" "lambda_function" {
   function_name = "hello-world-${var.tech}-${var.environment}"
   role          = aws_iam_role.lambda_exec.arn
