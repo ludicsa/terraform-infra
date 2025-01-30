@@ -36,14 +36,16 @@ jobs:
         run: |
           cd lambda-code/src
           zip -r lambda.zip .
-      
+
       - name: Verificar se o ZIP foi criado
-        run: |
-          ls -lh lambda-code/src/lambda.zip
-      
+        run: ls -lh lambda-code/src/lambda.zip
+
       - name: Mover ZIP para o diretório do Terraform
-        run: mv lambda-code/src/lambda.zip lambda.zip
-  
+        run: mv lambda-code/src/lambda.zip terraform-infra/lambda.zip
+
+      - name: Definir caminho do ZIP da Lambda
+        run: echo "LAMBDA_ZIP_PATH=terraform-infra/lambda.zip" >> $GITHUB_ENV
+
       - name: Configurar AWS Credenciais
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -57,12 +59,6 @@ jobs:
       - name: Limpar Cache do Terraform
         run: rm -rf .terraform
 
-      - name: Forçar Reconfiguração do Terraform
-        run: terraform init -reconfigure
-
-      - name: Instalar Terraform
-        uses: hashicorp/setup-terraform@v2
-
       - name: Inicializar Terraform
         run: |
           terraform init \
@@ -70,7 +66,11 @@ jobs:
             -backend-config="key=infra/terraform.tfstate" \
             -backend-config="region=us-east-1"
 
+      - name: Criar Plano do Terraform
+        run: |
+          terraform plan -out=tfplan \
+            -var="environment=${{ github.event.inputs.environment }}" \
+            -var="lambda_zip_path=${{ env.LAMBDA_ZIP_PATH }}"
+
       - name: Aplicar Terraform
-        run: terraform apply -auto-approve \
-          -var="environment=${{ github.event.inputs.environment }}" \
-          -var="lambda_zip_path=terraform-infra/lambda.zip"
+        run: terraform apply -auto-approve tfplan
