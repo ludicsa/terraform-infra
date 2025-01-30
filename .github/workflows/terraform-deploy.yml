@@ -36,10 +36,13 @@ jobs:
         run: |
           cd lambda-code/src
           zip -r ../../lambda.zip .
-
+      
+      - name: Verificar se o ZIP foi criado
+        run: ls -lh lambda.zip || ls -lh ../../lambda.zip
+      
       - name: Mover ZIP para o diretório do Terraform
-        run: mv lambda.zip terraform-infra/lambda.zip
-
+        run: mv lambda.zip terraform-infra/lambda.zip || mv ../../lambda.zip terraform-infra/lambda.zip
+  
       - name: Configurar AWS Credenciais
         uses: aws-actions/configure-aws-credentials@v1
         with:
