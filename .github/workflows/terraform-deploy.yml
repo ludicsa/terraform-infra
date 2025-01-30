@@ -69,7 +69,8 @@ jobs:
         run: |
           terraform plan -out=tfplan \
             -var="environment=${{ github.event.inputs.environment }}" \
-            -var="lambda_zip_path=${{ env.LAMBDA_ZIP_PATH }}"
+            -var="lambda_zip_path=${{ env.LAMBDA_ZIP_PATH }}" \
+            -var="tech=${{ github.event.inputs.tech }}"
 
       - name: Aplicar Terraform
         run: terraform apply -auto-approve tfplan
