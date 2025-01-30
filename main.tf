@@ -65,6 +65,12 @@ resource "aws_lambda_permission" "apigw_lambda" {
   source_arn = "${aws_apigatewayv2_api.lambda_api.execution_arn}/*/*"
 }
 
+###OUTPUTS
+output "api_gateway_url" {
+  value = aws_apigatewayv2_api.lambda_api.api_endpoint
+  description = "URL do API Gateway"
+}
+
 ###BACKEND
 terraform {
   backend "s3" {
