@@ -61,15 +61,4 @@ jobs:
                          -var "lambda_runtime=${{ inputs.runtime }}" \
                          -var "lambda_zip_file=lambda.zip"
 
-      - name: Obter Endpoint da API RAW
-        run: |
-          echo "API URL: $(terraform output -raw api_gateway_url)"
 
-      - name: Obter Endpoint da API ENV
-        id: get-url
-        run: |
-          API_URL=$(terraform output -raw api_gateway_url | tail -n 1 | tr -d '\n')
-          echo "API_URL=$API_URL" >> $GITHUB_ENV
-      
-      - name: Exibir Endpoint
-        run: echo "A API está disponível em $API_URL"
