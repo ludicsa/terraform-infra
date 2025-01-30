@@ -11,8 +11,12 @@ on:
           - dev
           - prod
       tech:
-        description: 'Tech stack (Python, Node.js, etc.)'
+        description: 'Escolha a stack (Python, Node.js, etc.)'
         required: true
+        type: choice
+        options:
+          - python3.9
+          - nodejs18.x
 
 jobs:
   deploy:
