@@ -22,8 +22,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout código do repositório `terraform-infra`
         uses: actions/checkout@v3
+
+      - name: Checkout código do repositório `lambda-code`
+        uses: actions/checkout@v3
+        with:
+          repository: ludicsa/lambda-code  # Atualize com o seu usuário/organização
+          path: lambda-code
+          ref: main  # Ou outra branch específica
+
+      - name: Gerar ZIP do código da Lambda
+        run: |
+          cd lambda-code/src
+          zip -r ../../lambda.zip .
+
+      - name: Mover ZIP para o diretório do Terraform
+        run: mv lambda.zip terraform-infra/lambda.zip
 
       - name: Configurar AWS Credenciais
         uses: aws-actions/configure-aws-credentials@v1
@@ -34,11 +49,6 @@ jobs:
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Gerar ZIP da Lambda
-        run: |
-          cd ../lambda-code/src
-          zip -r ../../terraform-infra/lambda.zip .
-
       - name: Inicializar Terraform
         run: terraform init -backend-config="bucket=terraform-tfstate"
 
@@ -46,5 +56,4 @@ jobs:
         run: terraform apply -auto-approve \
           -var="environment=${{ github.event.inputs.environment }}" \
           -var="api_url=${{ github.event.inputs.url }}" \
-          -var="lambda_zip_path=lambda.zip"
-
+          -var="lambda_zip_path=terraform-infra/lambda.zip"
