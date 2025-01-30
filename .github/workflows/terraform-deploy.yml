@@ -47,15 +47,25 @@ jobs:
       - name: Configurar AWS Credenciais
         uses: aws-actions/configure-aws-credentials@v1
         with:
+          aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+
+      - name: Limpar Cache do Terraform
+        run: rm -rf .terraform
+
+      - name: Forçar Reconfiguração do Terraform
+        run: terraform init -reconfigure
 
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v2
 
       - name: Inicializar Terraform
-        run: terraform init -backend-config="bucket=terraform-tfstate"
+        run: |
+          terraform init \
+            -backend-config="bucket=terraform-tfstate-87879564" \
+            -backend-config="key=infra/terraform.tfstate" \
+            -backend-config="region=us-east-1"
 
       - name: Aplicar Terraform
         run: terraform apply -auto-approve \
