@@ -39,7 +39,7 @@ jobs:
       
       - name: Verificar se o ZIP foi criado
         run: |
-          ls -lh lambda-code/src/lambda.zip || echo "Arquivo não encontrado!"
+          ls -lh lambda-code/src/lambda.zip
       
       - name: Mover ZIP para o diretório do Terraform
         run: mv lambda-code/src/lambda.zip lambda.zip
@@ -47,8 +47,9 @@ jobs:
       - name: Configurar AWS Credenciais
         uses: aws-actions/configure-aws-credentials@v1
         with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::<AWS_ACCOUNT_ID>:role/github-actions-role
 
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v2
