@@ -28,9 +28,9 @@ jobs:
       - name: Checkout código do repositório `lambda-code`
         uses: actions/checkout@v3
         with:
-          repository: ludicsa/lambda-code  # Atualize com o seu usuário/organização
+          repository: ludicsa/lambda-code  
           path: lambda-code
-          ref: main  # Ou outra branch específica
+          ref: master
 
       - name: Gerar ZIP do código da Lambda
         run: |
