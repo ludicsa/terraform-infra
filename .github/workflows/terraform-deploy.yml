@@ -60,3 +60,14 @@ jobs:
           terraform apply -auto-approve \
                          -var "lambda_runtime=${{ inputs.runtime }}" \
                          -var "lambda_zip_file=lambda.zip"
+
+      - name: Obter Endpoint da API RAW
+        run: |
+          echo "API URL: $(terraform output -raw api_gateway_url)"
+
+      - name: Obter Endpoint da API ENV
+        id: get-url
+        run: echo "API_URL=$(terraform output -raw api_gateway_url)" >> $GITHUB_ENV
+    
+      - name: Exibir Endpoint
+        run: echo "A API está disponível em $API_URL"
