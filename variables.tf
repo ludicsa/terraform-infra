@@ -12,3 +12,8 @@ variable "tech" {
   description = "Tecnologia utilizada na Lambda (Python, Node.js, etc.)"
   type        = string
 }
+
+variable "runtime" {
+  description = "Runtime da Lambda"
+  type        = string
+}
