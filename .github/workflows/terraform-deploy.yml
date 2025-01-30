@@ -11,11 +11,12 @@ on:
           - dev
           - prod
       tech:
-        description: 'Tech stack (Python, Node.js, etc.)'
+        description: 'Escolha a stack (Python, Node.js, etc.)'
         required: true
-      url:
-        description: 'URL da API Gateway'
-        required: false
+        type: choice
+        options:
+          - python3.9
+          - nodejs18.x
 
 jobs:
   deploy:
@@ -36,29 +37,45 @@ jobs:
         run: |
           cd lambda-code/src
           zip -r lambda.zip .
-      
+
       - name: Verificar se o ZIP foi criado
+        run: ls -lh lambda-code/src/lambda.zip
+
+      - name: Criar diretório do Terraform e mover ZIP
         run: |
-          ls -lh lambda-code/src/lambda.zip
-      
-      - name: Mover ZIP para o diretório do Terraform
-        run: mv lambda-code/src/lambda.zip lambda.zip
-  
+          mkdir -p terraform-infra
+          mv lambda-code/src/lambda.zip terraform-infra/lambda.zip
+
+      - name: Definir caminho do ZIP da Lambda
+        run: echo "LAMBDA_ZIP_PATH=terraform-infra/lambda.zip" >> $GITHUB_ENV
+
       - name: Configurar AWS Credenciais
         uses: aws-actions/configure-aws-credentials@v1
         with:
+          aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
 
       - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Inicializar Terraform
-        run: terraform init -backend-config="bucket=terraform-tfstate"
+      - name: Limpar Cache do Terraform
+        run: rm -rf .terraform
 
+      - name: Inicializar Terraform
+        run: |
+          terraform init \
+            -backend-config="bucket=terraform-tfstate-87879564" \
+            -backend-config="key=infra/terraform.tfstate" \
+            -backend-config="region=us-east-1"
+
+      - name: Criar Plano do Terraform
+        run: |
+          terraform plan -out=tfplan \
+            -var="environment=${{ github.event.inputs.environment }}" \
+            -var="lambda_zip_path=${{ env.LAMBDA_ZIP_PATH }}" \
+            -var="tech=${{ github.event.inputs.tech }}"
+            -var="runtime=${{ github.event.inputs.tech }}"
+      
       - name: Aplicar Terraform
-        run: terraform apply -auto-approve \
-          -var="environment=${{ github.event.inputs.environment }}" \
-          -var="api_url=${{ github.event.inputs.url }}" \
-          -var="lambda_zip_path=terraform-infra/lambda.zip"
+        run: terraform apply -auto-approve tfplan
