@@ -1,10 +1,5 @@
 variable "environment" {
-  description = "Ambiente (dev/prod)"
-  type        = string
-}
-
-variable "api_url" {
-  description = "URL da API Gateway"
+  description = "Ambiente de deploy (dev/prod)"
   type        = string
 }
 
