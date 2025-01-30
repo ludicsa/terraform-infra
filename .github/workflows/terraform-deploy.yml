@@ -40,8 +40,10 @@ jobs:
       - name: Verificar se o ZIP foi criado
         run: ls -lh lambda-code/src/lambda.zip
 
-      - name: Mover ZIP para o diretório do Terraform
-        run: mv lambda-code/src/lambda.zip terraform-infra/lambda.zip
+      - name: Criar diretório do Terraform e mover ZIP
+        run: |
+          mkdir -p terraform-infra
+          mv lambda-code/src/lambda.zip terraform-infra/lambda.zip
 
       - name: Definir caminho do ZIP da Lambda
         run: echo "LAMBDA_ZIP_PATH=terraform-infra/lambda.zip" >> $GITHUB_ENV
