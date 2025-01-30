@@ -8,3 +8,13 @@ resource "aws_lambda_function" "lambda_function" {
   filename      = var.lambda_zip_file
   role          = aws_iam_role.lambda_role.arn
 }
+
+
+terraform {
+  backend "s3" {
+    bucket         = "terraform-tfstate-87879564"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+  }
+}
