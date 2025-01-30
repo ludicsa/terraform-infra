@@ -7,9 +7,12 @@ on:
         description: 'Linguagem da Lambda (ex: python3.9, nodejs18.x)'
         required: true
       env:
-        description: 'Ambiente de destino (dev ou prod)'
+        description: 'Ambiente de destino'
         required: true
-        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
 
 jobs:
   deploy:
