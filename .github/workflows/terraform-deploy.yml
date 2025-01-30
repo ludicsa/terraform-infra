@@ -38,6 +38,9 @@ jobs:
           cd lambda-code/src
           zip -r ../../lambda.zip .
 
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v2
+
       - name: Aplicar Terraform
         run: |
           terraform init
