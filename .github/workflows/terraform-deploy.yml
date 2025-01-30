@@ -1,1 +1,50 @@
+name: Terraform Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Escolha o ambiente (dev/prod)'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+      tech:
+        description: 'Tech stack (Python, Node.js, etc.)'
+        required: true
+      url:
+        description: 'URL da API Gateway'
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Configurar AWS Credenciais
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::<AWS_ACCOUNT_ID>:role/github-actions-role
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Gerar ZIP da Lambda
+        run: |
+          cd ../lambda-code/src
+          zip -r ../../terraform-infra/lambda.zip .
+
+      - name: Inicializar Terraform
+        run: terraform init -backend-config="bucket=terraform-tfstate"
+
+      - name: Aplicar Terraform
+        run: terraform apply -auto-approve \
+          -var="environment=${{ github.event.inputs.environment }}" \
+          -var="api_url=${{ github.event.inputs.url }}" \
+          -var="lambda_zip_path=lambda.zip"
 
