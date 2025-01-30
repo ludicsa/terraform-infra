@@ -73,5 +73,4 @@ jobs:
       - name: Aplicar Terraform
         run: terraform apply -auto-approve \
           -var="environment=${{ github.event.inputs.environment }}" \
-          -var="api_url=${{ github.event.inputs.url }}" \
           -var="lambda_zip_path=terraform-infra/lambda.zip"
