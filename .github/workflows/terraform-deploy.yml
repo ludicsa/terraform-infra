@@ -67,7 +67,7 @@ jobs:
 
       - name: Obter Endpoint da API ENV
         id: get-url
-        run: echo "API_URL=$(terraform output -raw api_gateway_url)" >> $GITHUB_ENV
+        run: echo "API_URL=$(terraform output -raw api_gateway_url | tr -d '\n')" >> $GITHUB_ENV
     
       - name: Exibir Endpoint
         run: echo "A API está disponível em $API_URL"
