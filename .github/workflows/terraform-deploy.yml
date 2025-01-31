@@ -64,5 +64,6 @@ jobs:
           terraform apply -auto-approve \
                          -var "lambda_runtime=${{ inputs.runtime }}" \
                          -var "lambda_zip_file=lambda.zip"
+                         -var "lambda_name=${{ inputs.name}}"
 
 
