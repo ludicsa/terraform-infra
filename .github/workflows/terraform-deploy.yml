@@ -9,12 +9,24 @@ on:
       name:
         description: 'O nome da função Lambda'
         required: true
-      env:
+      environment:
         description: 'Ambiente de destino'
         required: true
         type: choice
         options:
           - dev
+          - stg
+          - prod
+      api_id:
+        description: 'URL da API Gateway'
+        required: true
+      api_stage:
+        description: 'Stage da API Gateway'
+        required: true
+        type: choice
+        options:
+          - dev
+          - stg
           - prod
 
 jobs:
@@ -57,13 +69,17 @@ jobs:
         run: |
           terraform plan -var "lambda_runtime=${{ inputs.runtime }}" \
                          -var "lambda_zip_file=lambda.zip" \
-                         -var "lambda_name=${{ inputs.name}}"
+                         -var "lambda_name=${{ inputs.name}}" \
+                         -var "api_id=${{ inputs.api_id }}" \
+                         -var "api_stage=${{ inputs.api_stage }}"
 
       - name: Terrafom apply
         run: |
           terraform apply -auto-approve \
                          -var "lambda_runtime=${{ inputs.runtime }}" \
                          -var "lambda_zip_file=lambda.zip" \
-                         -var "lambda_name=${{ inputs.name}}"
+                         -var "lambda_name=${{ inputs.name}}" \
+                         -var "api_id=${{ inputs.api_id }}" \
+                         -var "api_stage=${{ inputs.api_stage }}"
 
 

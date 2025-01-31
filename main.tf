@@ -1,6 +1,8 @@
 variable "lambda_runtime" {}
 variable "lambda_zip_file" {}
 variable "lambda_name" {}
+variable "api_id" {}
+variable "api_stage" {}
 
 ###LAMBDA
 resource "aws_iam_role" "lambda_role" {
@@ -33,27 +35,16 @@ resource "aws_lambda_function" "lambda_function" {
 }
 
 ###API-GATEWAY
-resource "aws_apigatewayv2_api" "lambda_api" {
-  name          = "lambda-api"
-  protocol_type = "HTTP"
-}
-
 resource "aws_apigatewayv2_integration" "lambda_integration" {
-  api_id           = aws_apigatewayv2_api.lambda_api.id
+  api_id           = var.api_id 
   integration_type = "AWS_PROXY"
   integration_uri  = aws_lambda_function.lambda_function.invoke_arn
 }
 
 resource "aws_apigatewayv2_route" "lambda_route" {
-  api_id    = aws_apigatewayv2_api.lambda_api.id
+  api_id    = var.api_id
   route_key = "GET /hello"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-}
-
-resource "aws_apigatewayv2_stage" "default" {
-  api_id      = aws_apigatewayv2_api.lambda_api.id
-  name        = "default"
-  auto_deploy = true
 }
 
 resource "aws_lambda_permission" "apigw_lambda" {
@@ -61,8 +52,7 @@ resource "aws_lambda_permission" "apigw_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.function_name
   principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_apigatewayv2_api.lambda_api.execution_arn}/*/*"
+  source_arn    = "${var.api_id}/*/*"
 }
 
 ###OUTPUTS
