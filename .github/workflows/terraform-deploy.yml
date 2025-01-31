@@ -39,10 +39,10 @@ jobs:
 
       - name: Configure AWS Credentials
         run: |
-          echo "Usando ambiente: ${{ inputs.env }}"
+          echo "Usando ambiente: ${{ inputs.environment }}"
           echo "Configurando credenciais AWS..."
-          echo "AWS_ACCESS_KEY_ID=${{ secrets[format('AWS_ACCESS_KEY_ID_{0}', inputs.env)] }}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', inputs.env)] }}" >> $GITHUB_ENV
+          echo "AWS_ACCESS_KEY_ID=${{ secrets[format('AWS_ACCESS_KEY_ID_{0}', inputs.environment)] }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', inputs.environment)] }}" >> $GITHUB_ENV
           echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV
 
       - name: Clone lambda repository
