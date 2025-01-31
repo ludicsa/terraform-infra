@@ -1,6 +1,6 @@
 variable "lambda_runtime" {}
 variable "lambda_zip_file" {}
-
+variable "lambda_name" {}
 
 ###LAMBDA
 resource "aws_iam_role" "lambda_role" {
@@ -34,7 +34,7 @@ resource "aws_lambda_function" "lambda_function" {
 
 ###API-GATEWAY
 resource "aws_apigatewayv2_api" "lambda_api" {
-  name          = "lambda-api"
+  name          = var.lambda_name
   protocol_type = "HTTP"
 }
 
