@@ -11,7 +11,7 @@ resource "aws_lambda_function" "lambda_function" {
 
 terraform {
   backend "s3" {
-    bucket         = "terraform-tfstate-87879564"
+    bucket         = "terraform-tfstate-878795645"
     key            = "terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
