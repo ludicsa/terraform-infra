@@ -1,0 +1,18 @@
+# Diretório local do Terraform
+.terraform/
+
+# Lockfile do Terraform (pode manter se quiser controlar versões de provedores)
+.terraform.lock.hcl
+
+# Arquivos de state do Terraform (NÃO versionar!)
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+
+# Arquivos sensíveis
+*.tfvars
+*.tfvars.json
+
+# Logs de crash do Terraform
+crash.log

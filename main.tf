@@ -27,7 +27,7 @@ resource "aws_iam_policy_attachment" "lambda_policy" {
 resource "aws_lambda_function" "lambda_function" {
   function_name = "my_lambda_function"
   runtime       = var.lambda_runtime
-  handler       = "index.handler"
+  handler       = "main.lambda_handler"
   filename      = var.lambda_zip_file
   role          = aws_iam_role.lambda_role.arn  
 }
