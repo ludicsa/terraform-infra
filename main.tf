@@ -25,7 +25,7 @@ resource "aws_iam_policy_attachment" "lambda_policy" {
 }
 
 resource "aws_lambda_function" "lambda_function" {
-  function_name = "my_lambda_function"
+  function_name = var.lambda_name
   runtime       = var.lambda_runtime
   handler       = "main.lambda_handler"
   filename      = var.lambda_zip_file
@@ -34,7 +34,7 @@ resource "aws_lambda_function" "lambda_function" {
 
 ###API-GATEWAY
 resource "aws_apigatewayv2_api" "lambda_api" {
-  name          = var.lambda_name
+  name          = "lambda-api"
   protocol_type = "HTTP"
 }
 
