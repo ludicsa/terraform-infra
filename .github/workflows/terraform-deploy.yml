@@ -6,6 +6,9 @@ on:
       runtime:
         description: 'Linguagem da Lambda (ex: python3.9, nodejs18.x)'
         required: true
+      name:
+        description: 'O nome da função Lambda'
+        required: true
       env:
         description: 'Ambiente de destino'
         required: true
@@ -53,7 +56,8 @@ jobs:
       - name: Terraform plan
         run: |
           terraform plan -var "lambda_runtime=${{ inputs.runtime }}" \
-                         -var "lambda_zip_file=lambda.zip"
+                         -var "lambda_zip_file=lambda.zip" \
+                         -var "lambda_name=${{ inputs.name}}"
 
       - name: Terrafom apply
         run: |
