@@ -1,4 +1,4 @@
-name: Deploy Lambda with Terraform
+name: Deploy Lambda
 
 on:
   workflow_dispatch:
