@@ -38,10 +38,10 @@ resource "aws_lambda_function" "lambda_function" {
 
 ###API-GATEWAY
 resource "aws_apigatewayv2_integration" "lambda_integration" {
-  api_id           = var.api_id 
+  api_id           = var.api_id
   integration_type = "AWS_PROXY"
   integration_uri  = aws_lambda_function.lambda_function.invoke_arn
-  connection_type    = "INTERNET"
+  connection_type  = "INTERNET"
 }
 
 
