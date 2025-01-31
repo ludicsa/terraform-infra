@@ -46,7 +46,7 @@ jobs:
 
       - name: Inicializar Terraform
         run: |
-          terraform init -backend-config="bucket=terraform-tfstate-87879564" \
+          terraform init -backend-config="bucket=terraform-tfstate-878795645" \
                          -backend-config="key=terraform.tfstate" \
                          -backend-config="region=us-east-1"
 
