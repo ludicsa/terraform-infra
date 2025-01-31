@@ -55,15 +55,6 @@ resource "aws_lambda_permission" "apigw_lambda" {
   source_arn    = "arn:aws:apigateway:us-east-1::/apis/${var.api_id}/*"
 }
 
-##API VARIABLES
-variable "api_id" {
-  description = "ID da API Gateway existente"
-}
-
-variable "api_stage" {
-  description = "Stage da API Gateway"
-}
-
 ###OUTPUTS
 output "api_gateway_url" {
   value = "https://${var.api_id}.execute-api.us-east-1.amazonaws.com/${var.api_stage}"
