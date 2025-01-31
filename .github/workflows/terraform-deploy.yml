@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repositório Terraform
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configurar credenciais AWS
+      - name: Configure AWS Credentials
         run: |
           echo "Usando ambiente: ${{ inputs.env }}"
           echo "Configurando credenciais AWS..."
@@ -30,32 +30,32 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', inputs.env)] }}" >> $GITHUB_ENV
           echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV
 
-      - name: Clonar código da Lambda
+      - name: Clone lambda repository
         uses: actions/checkout@v4
         with:
           repository: 'ludicsa/lambda-code'
           path: 'lambda-code'
 
-      - name: Compactar código da Lambda
+      - name: Compress lambda code
         run: |
           cd lambda-code/src
           zip -r ../../lambda.zip .
 
-      - name: Instalar Terraform
+      - name: Install terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Inicializar Terraform
+      - name: Terraform init
         run: |
           terraform init -backend-config="bucket=terraform-tfstate-878795645" \
                          -backend-config="key=terraform.tfstate" \
                          -backend-config="region=us-east-1"
 
-      - name: Executar Terraform Plan
+      - name: Terraform plan
         run: |
           terraform plan -var "lambda_runtime=${{ inputs.runtime }}" \
                          -var "lambda_zip_file=lambda.zip"
 
-      - name: Aplicar Terraform
+      - name: Terrafom apply
         run: |
           terraform apply -auto-approve \
                          -var "lambda_runtime=${{ inputs.runtime }}" \
