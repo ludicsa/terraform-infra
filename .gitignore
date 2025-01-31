@@ -16,3 +16,7 @@ terraform.tfstate.backup
 
 # Logs de crash do Terraform
 crash.log
+
+
+# Destroy terraform
+destroy-terraform.sh
