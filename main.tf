@@ -4,6 +4,8 @@ variable "lambda_name" {}
 variable "api_id" {}
 variable "api_stage" {}
 
+data "aws_caller_identity" "current" {}
+
 ###LAMBDA
 resource "aws_iam_role" "lambda_role" {
   name = "lambda_execution_role"
@@ -48,6 +50,7 @@ resource "aws_lambda_permission" "apigw_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.function_name
   principal     = "apigateway.amazonaws.com"
+
   source_arn = "arn:aws:execute-api:us-east-1:${data.aws_caller_identity.current.account_id}:${var.api_id}/*/*"
 }
 
