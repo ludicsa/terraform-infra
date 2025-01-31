@@ -18,7 +18,7 @@ on:
           - stg
           - prod
       api_id:
-        description: 'URL da API Gateway'
+        description: 'ID da API Gateway'
         required: true
       api_stage:
         description: 'Stage da API Gateway'

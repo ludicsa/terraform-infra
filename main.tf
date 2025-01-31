@@ -52,12 +52,21 @@ resource "aws_lambda_permission" "apigw_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${var.api_id}/*/*"
+  source_arn    = "arn:aws:apigateway:us-east-1::/apis/${var.api_id}/*"
+}
+
+##API VARIABLES
+variable "api_id" {
+  description = "ID da API Gateway existente"
+}
+
+variable "api_stage" {
+  description = "Stage da API Gateway"
 }
 
 ###OUTPUTS
 output "api_gateway_url" {
-  value = aws_apigatewayv2_api.lambda_api.api_endpoint
+  value = "https://${var.api_id}.execute-api.us-east-1.amazonaws.com/${var.api_stage}"
   description = "URL do API Gateway"
 }
 
