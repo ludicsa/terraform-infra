@@ -41,11 +41,6 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   integration_uri  = aws_lambda_function.lambda_function.invoke_arn
 }
 
-resource "aws_apigatewayv2_route" "lambda_route" {
-  api_id    = var.api_id
-  route_key = "GET /hello"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-}
 
 resource "aws_lambda_permission" "apigw_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
