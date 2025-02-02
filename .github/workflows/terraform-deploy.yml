@@ -3,14 +3,19 @@ name: Deploy Lambda
 on:
   workflow_dispatch:
     inputs:
-      runtime:
-        description: 'Linguagem da Lambda (ex: python3.9, nodejs18.x)'
+      microservice:
+        description: 'Select the microservice (e.g., version1, version2, version3)'
         required: true
-      name:
-        description: 'O nome da função Lambda'
+        type: choice
+        options:
+          - version1
+          - version2
+          - version3
+      function:
+        description: 'Select the Lambda function to deploy (inside the selected microservice)'
         required: true
       environment:
-        description: 'Ambiente de destino'
+        description: 'Deployment environment'
         required: true
         type: choice
         options:
@@ -18,10 +23,10 @@ on:
           - stg
           - prod
       api_id:
-        description: 'ID da API Gateway'
+        description: 'API Gateway ID'
         required: true
       api_stage:
-        description: 'Stage da API Gateway'
+        description: 'API Gateway Stage'
         required: true
         type: choice
         options:
@@ -34,29 +39,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout infrastructure repository
         uses: actions/checkout@v4
 
       - name: Configure AWS Credentials
         run: |
-          echo "Usando ambiente: ${{ inputs.environment }}"
-          echo "Configurando credenciais AWS..."
+          echo "Using environment: ${{ inputs.environment }}"
+          echo "Configuring AWS credentials..."
           echo "AWS_ACCESS_KEY_ID=${{ secrets[format('AWS_ACCESS_KEY_ID_{0}', inputs.environment)] }}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets[format('AWS_SECRET_ACCESS_KEY_{0}', inputs.environment)] }}" >> $GITHUB_ENV
           echo "AWS_DEFAULT_REGION=us-east-1" >> $GITHUB_ENV
 
-      - name: Clone lambda repository
+      - name: Clone Lambda repository
         uses: actions/checkout@v4
         with:
           repository: 'ludicsa/lambda-code'
           path: 'lambda-code'
 
-      - name: Compress lambda code
+      - name: Extract runtime from serverless.yml
+        id: extract-runtime
         run: |
-          cd lambda-code/src
-          zip -r ../../lambda.zip .
+          SERVERLESS_FILE="lambda-code/service/${{ inputs.microservice }}/serverless.yml"
+          if [ -f "$SERVERLESS_FILE" ]; then
+            RUNTIME=$(grep 'runtime:' "$SERVERLESS_FILE" | awk '{print $2}')
+            echo "Extracted runtime: $RUNTIME"
+            echo "LAMBDA_RUNTIME=$RUNTIME" >> $GITHUB_ENV
+          else
+            echo "serverless.yml not found! Using default runtime."
+            echo "LAMBDA_RUNTIME=nodejs18.x" >> $GITHUB_ENV
+          fi
 
-      - name: Install terraform
+      - name: Compress Selected Lambda Function
+        run: |
+          FUNCTION_PATH="lambda-code/service/${{ inputs.microservice }}/controllers/${{ inputs.function }}"
+          if [ -d "$FUNCTION_PATH" ]; then
+            echo "Compressing function: ${{ inputs.function }}"
+            cd "$FUNCTION_PATH"
+            zip -r ../../../lambda.zip .
+          else
+            echo "Error: Function ${{ inputs.function }} not found!"
+            exit 1
+          fi
+
+      - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
 
       - name: Terraform init
@@ -67,19 +92,19 @@ jobs:
 
       - name: Terraform plan
         run: |
-          terraform plan -var "lambda_runtime=${{ inputs.runtime }}" \
+          terraform plan -var "lambda_runtime=$LAMBDA_RUNTIME" \
                          -var "lambda_zip_file=lambda.zip" \
-                         -var "lambda_name=${{ inputs.name}}" \
+                         -var "lambda_name=${{ inputs.function }}" \
+                         -var "microservice=${{ inputs.microservice }}" \
                          -var "api_id=${{ inputs.api_id }}" \
                          -var "api_stage=${{ inputs.api_stage }}"
 
-      - name: Terrafom apply
+      - name: Terraform apply
         run: |
           terraform apply -auto-approve \
-                         -var "lambda_runtime=${{ inputs.runtime }}" \
+                         -var "lambda_runtime=$LAMBDA_RUNTIME" \
                          -var "lambda_zip_file=lambda.zip" \
-                         -var "lambda_name=${{ inputs.name}}" \
+                         -var "lambda_name=${{ inputs.function }}" \
+                         -var "microservice=${{ inputs.microservice }}" \
                          -var "api_id=${{ inputs.api_id }}" \
                          -var "api_stage=${{ inputs.api_stage }}"
-
-

@@ -1,12 +1,13 @@
 variable "lambda_runtime" {}
 variable "lambda_zip_file" {}
 variable "lambda_name" {}
+variable "microservice" {}
 variable "api_id" {}
 variable "api_stage" {}
 
 data "aws_caller_identity" "current" {}
 
-###LAMBDA
+### IAM Role for Lambda
 resource "aws_iam_role" "lambda_role" {
   name = "lambda_execution_role"
 
@@ -28,15 +29,16 @@ resource "aws_iam_policy_attachment" "lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+### Lambda Function
 resource "aws_lambda_function" "lambda_function" {
-  function_name = var.lambda_name
+  function_name = "${var.microservice}-${var.lambda_name}"
   runtime       = var.lambda_runtime
-  handler       = "main.lambda_handler"
+  handler       = "index.handler"
   filename      = var.lambda_zip_file
   role          = aws_iam_role.lambda_role.arn  
 }
 
-###API-GATEWAY
+### API Gateway Integration
 resource "aws_apigatewayv2_integration" "lambda_integration" {
   api_id           = var.api_id
   integration_type = "AWS_PROXY"
@@ -44,23 +46,23 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   connection_type  = "INTERNET"
 }
 
-
+### API Gateway Permission for Lambda
 resource "aws_lambda_permission" "apigw_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda_function.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "arn:aws:execute-api:us-east-1:${data.aws_caller_identity.current.account_id}:${var.api_id}/*/GET/hello"
+  source_arn = "arn:aws:execute-api:us-east-1:${data.aws_caller_identity.current.account_id}:${var.api_id}/*/GET/${var.lambda_name}"
 }
 
-###OUTPUTS
+### Output API Gateway URL
 output "api_gateway_url" {
-  value = "https://${var.api_id}.execute-api.us-east-1.amazonaws.com/${var.api_stage}"
-  description = "URL do API Gateway"
+  value       = "https://${var.api_id}.execute-api.us-east-1.amazonaws.com/${var.api_stage}/${var.lambda_name}"
+  description = "API Gateway URL for the Lambda Function"
 }
 
-###BACKEND
+### Terraform Backend
 terraform {
   backend "s3" {
     bucket         = "terraform-tfstate-878795645"
